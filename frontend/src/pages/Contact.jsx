@@ -9,26 +9,37 @@ const Contact = () => {
   const [message, setMessage] = useState('');
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     setSubmitting(true);
     setMessage('');
 
     try {
-      const formData = new FormData();
-      Object.keys(data).forEach(key => {
-        if (key === 'image' && data[key][0]) {
-          formData.append(key, data[key][0]);
-        } else {
-          formData.append(key, data[key]);
-        }
-      });
+      const phone = '916294033057';
+      let text = '';
 
-      const endpoint = formType === 'contact' ? '/contact' : '/bookings';
-      await API.post(endpoint, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (formType === 'contact') {
+        text = `🔧 *New Contact Message*\n\n`
+          + `👤 *Name:* ${data.name}\n`
+          + `${data.email ? `📧 *Email:* ${data.email}\n` : ''}`
+          + `📞 *Phone:* ${data.phone}\n`
+          + `💬 *Message:* ${data.message}`;
+      } else {
+        text = `🔧 *New Service Booking*\n\n`
+          + `👤 *Name:* ${data.name}\n`
+          + `${data.email ? `📧 *Email:* ${data.email}\n` : ''}`
+          + `📞 *Phone:* ${data.phone}\n`
+          + `🛠️ *Service:* ${data.service}\n`
+          + `📍 *Address:* ${data.address}\n`
+          + `📅 *Preferred Date:* ${data.preferredDate}\n`
+          + `⏰ *Preferred Time:* ${data.preferredTime}\n`
+          + `${data.deviceInfo ? `📱 *Device Info:* ${data.deviceInfo}\n` : ''}`
+          + `📝 *Issue:* ${data.issueDescription}`;
+      }
 
-      setMessage('Thank you! We will contact you soon.');
+      const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, '_blank');
+
+      setMessage('Redirecting to WhatsApp...');
       reset();
     } catch (error) {
       setMessage('Something went wrong. Please try again or call us directly.');
