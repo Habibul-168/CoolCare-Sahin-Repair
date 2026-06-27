@@ -17,28 +17,30 @@ const createAdminUser = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
+    const email = process.env.ADMIN_EMAIL || 'admin@techpro.com';
+    const password = process.env.ADMIN_PASSWORD || 'admin123';
+
     // Check if admin exists
-    const existingAdmin = await User.findOne({ email: 'admin@techpro.com' });
+    const existingAdmin = await User.findOne({ email });
     
     if (existingAdmin) {
-      console.log('Admin user already exists!');
+      console.log(`Admin user with email ${email} already exists!`);
       process.exit(0);
     }
 
     // Create admin user
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     
     const admin = new User({
-      email: 'admin@techpro.com',
+      email,
       password: hashedPassword,
       role: 'admin'
     });
 
     await admin.save();
     console.log('Admin user created successfully!');
-    console.log('Email: admin@techpro.com');
-    console.log('Password: admin123');
-    console.log('⚠️ Please change this password after first login!');
+    console.log(`Email: ${email}`);
+    console.log(`Password: ${password}`);
     
     process.exit(0);
   } catch (error) {
@@ -48,3 +50,4 @@ const createAdminUser = async () => {
 };
 
 createAdminUser();
+
